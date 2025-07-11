@@ -79,6 +79,8 @@ def active_chats(
     user = get_user_by_username(db, current_username)
     return get_active_or_searched_chats(db, user.id, search)
 
+
+
 @app.delete("/delete_account")
 def delete_account(
     request: DeleteAccountRequest,

@@ -6,14 +6,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Light theme */
       --bg-gradient: linear-gradient(135deg, #e6ecf0 0%, #cfd9df 100%);
       --bg-image: url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80');
       --glass-bg: rgba(255,255,255,0.90);
       --card-border: #e1e8ed;
       --card-shadow: 0 10px 40px 0 rgba(20, 30, 40, 0.10);
-      --button-bg: #1d9bf0;
-      --button-hover: #0c7abf;
+      --button-bg: #022f6f;
+      --button-hover: #011a3a;
       --button-text: #fff;
       --input-bg: #f7fafd;
       --input-border: #bfc9d1;
@@ -22,14 +21,13 @@
       --modal-border: #e1e8ed;
     }
     body.dark {
-      /* Dark theme */
       --bg-gradient: linear-gradient(135deg, #10151a 0%, #181c21 100%);
       --bg-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80');
       --glass-bg: rgba(24,28,33,0.96);
       --card-border: #22272a;
       --card-shadow: 0 10px 40px 0 rgba(10, 12, 15, 0.40);
-      --button-bg: #1d9bf0;
-      --button-hover: #0c7abf;
+      --button-bg: #022f6f;
+      --button-hover: #011a3a;
       --button-text: #fff;
       --input-bg: #23272f;
       --input-border: #38404a;
@@ -140,13 +138,14 @@
       border-color: var(--button-bg);
       box-shadow: 0 0 12px var(--button-bg);
     }
-    .action-row {
+    .action-btn {
       display: flex;
-      justify-content: center;
-      gap: 28px;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
       margin-top: 18px;
     }
-    button.action {
+    .action-btn button {
       width: 110px;
       padding: 11px;
       font-size: 14px;
@@ -157,15 +156,16 @@
       cursor: pointer;
       font-weight: 600;
       letter-spacing: .5px;
-      box-shadow: 0 4px 16px #1d9bf022;
+      box-shadow: 0 4px 16px #022f6f22;
       transition: all 0.22s cubic-bezier(.4,2,.6,1);
+      margin: 0;
     }
-    button.action:hover {
+    .action-btn button:hover {
       background: var(--button-hover);
       transform: translateY(-2px) scale(1.04);
-      box-shadow: 0 8px 24px #1d9bf033;
+      box-shadow: 0 8px 24px #022f6f33;
     }
-    /* Modal Example (for consistency with others) */
+    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -185,10 +185,55 @@
       border: 2px solid var(--modal-border);
       box-shadow: 0 10px 40px 0 #000a;
       border-radius: 18px;
-      padding: 36px 32px;
-      min-width: 320px;
-      max-width: 90vw;
+      padding: 44px 38px 32px 38px;
+      min-width: 350px;
+      max-width: 95vw;
       color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .modal-content h3 {
+      margin-bottom: 22px;
+      color: var(--button-bg);
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 260px;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 16px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      width: 100px;
+      padding: 10px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: none;
+      background: var(--button-bg);
+      color: var(--button-text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .modal-actions button:hover {
+      background: var(--button-hover);
+    }
+    .register-feedback {
+      color: #e74c3c;
+      margin-top: 10px;
+      min-height: 22px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 500;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(30px);}
@@ -200,59 +245,150 @@
   <button class="toggle-mode" onclick="toggleDarkMode()">Dark Mode</button>
   <div class="center-box">
     <div class="logo-title">
-      <img src="https://toppng.com/uploads/preview/phone-icon-11549498584attf3ik674.png" alt="Logo" />
-      <h1>Real-Time.com</h1>
+      <img src="https://cdn-icons-png.flaticon.com/512/724/724664.png" alt="Phone Logo" />
+      <h1>Real-Time</h1>
     </div>
     <div class="form-section">
       <h2>Login / Register</h2>
       <input id="username" placeholder="Username" autocomplete="username" />
       <input id="password" placeholder="Password" type="password" autocomplete="current-password" />
-      <div class="action-row">
+      <div class="action-btn">
         <button class="action" onclick="login()">Login</button>
-        <button class="action" onclick="register()">Register</button>
+        <button class="action" onclick="openRegisterModal()">Register</button>
       </div>
     </div>
   </div>
-  <script>
-    if (localStorage.getItem("darkMode") === "true") {
-      document.body.classList.add("dark");
+
+  <!-- Registration Modal -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <h3>Enter Username and Confirm Password to Create Account</h3>
+      <input id="reg-username" placeholder="Username" autocomplete="off" />
+      <input id="reg-password" placeholder="Password" type="password" autocomplete="new-password" />
+      <input id="reg-confirm" placeholder="Confirm Password" type="password" autocomplete="new-password" />
+      <div id="register-feedback" class="register-feedback"></div>
+      <div class="modal-actions">
+        <button onclick="createAccount()">Create</button>
+        <button onclick="closeRegisterModal()">Exit</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Theme toggle
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark");
+  }
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  }
+
+  // Modal logic
+  function openRegisterModal() {
+    document.getElementById('registerModal').classList.add('show');
+    document.getElementById('reg-username').value = '';
+    document.getElementById('reg-password').value = '';
+    document.getElementById('reg-confirm').value = '';
+    document.getElementById('register-feedback').textContent = '';
+    // Focus on username field when modal opens
+    setTimeout(() => document.getElementById('reg-username').focus(), 100);
+  }
+  function closeRegisterModal() {
+    document.getElementById('registerModal').classList.remove('show');
+  }
+  window.onclick = function(event) {
+    const modal = document.getElementById('registerModal');
+    if (event.target === modal) {
+      closeRegisterModal();
     }
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  }
+
+  // Login logic
+  async function login() {
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const res = await fetch("http://localhost:8000/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `username=${username.value}&password=${password.value}`
+    });
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("username", username.value);
+      window.location.href = "chat.html";
+    } else {
+      alert("Login failed.");
     }
-    async function login() {
-      const res = await fetch("http://localhost:8000/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `username=${username.value}&password=${password.value}`
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("username", username.value);
-        window.location.href = "chat.html";
-      } else {
-        alert("Login failed.");
-      }
+  }
+
+  // Registration logic with password match and username taken handling
+  async function createAccount() {
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    const feedback = document.getElementById('register-feedback');
+
+    feedback.textContent = '';
+
+    if (!username || !password || !confirm) {
+      feedback.textContent = "Please fill all fields.";
+      feedback.style.color = "#e74c3c";
+      return;
     }
-    async function register() {
+    if (password !== confirm) {
+      feedback.textContent = "Passwords do not match.";
+      feedback.style.color = "#e74c3c";
+      return;
+    }
+    try {
       const res = await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: username.value,
-          password: password.value
-        })
+        body: JSON.stringify({ username, password })
       });
       if (res.ok) {
-        alert("Registered successfully. Now login.");
-        username.value = "";
-        password.value = "";
+        feedback.style.color = "#27ae60";
+        feedback.textContent = "Registered successfully. Now login.";
+        setTimeout(() => {
+          closeRegisterModal();
+        }, 1200);
       } else {
-        alert("Registration failed.");
+        let msg = "Registration failed.";
+        try {
+          const data = await res.json();
+          if (data && data.detail && typeof data.detail === "string" && data.detail.toLowerCase().includes("username")) {
+            msg = "Username taken";
+          }
+        } catch (e) {}
+        feedback.style.color = "#e74c3c";
+        feedback.textContent = msg;
       }
+    } catch (err) {
+      feedback.style.color = "#e74c3c";
+      feedback.textContent = "Registration failed.";
     }
-  </script>
+  }
+
+  // --- Keyboard support for Enter key ---
+  // Login form: Enter triggers login
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('username').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') login();
+    });
+    document.getElementById('password').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') login();
+    });
+
+    // Register modal: Enter triggers createAccount
+    ['reg-username', 'reg-password', 'reg-confirm'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') createAccount();
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
