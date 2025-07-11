@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Chats</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Light theme */
+  --bg-gradient: linear-gradient(135deg, #e6ecf0 0%, #cfd9df 100%);
+  --bg-image: url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80');
+  --glass-bg: rgba(255,255,255,0.92);
+  --card-border: #e1e8ed;
+  --card-shadow: 0 10px 40px 0 rgba(20, 30, 40, 0.10);
+  --button-bg: #1d9bf0;
+  --button-hover: #0c7abf;
+  --button-text: #fff;
+  --input-bg: #f7fafd;
+  --input-border: #bfc9d1;
+  --text-color: #1a1a1a;
+  --modal-bg: rgba(255,255,255,0.98);
+  --modal-border: #e1e8ed;
+}
+body.dark {
+  /* Dark theme */
+  --bg-gradient: linear-gradient(135deg, #10151a 0%, #181c21 100%);
+  --bg-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80');
+  --glass-bg: rgba(24,28,33,0.96);
+  --card-border: #22272a;
+  --card-shadow: 0 10px 40px 0 rgba(10, 12, 15, 0.40);
+  --button-bg: #1d9bf0;
+  --button-hover: #0c7abf;
+  --button-text: #fff;
+  --input-bg: #23272f;
+  --input-border: #38404a;
+  --text-color: #f7fafd;
+  --modal-bg: #181c21;
+  --modal-border: #38404a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-gradient), var(--bg-image) no-repeat center center fixed;
+  background-size: cover;
+  color: var(--text-color);
+  min-height: 100vh;
+  transition: background 0.5s, color 0.5s;
+  position: relative;
+  padding: 40px 20px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--bg-gradient), var(--bg-image) no-repeat center center fixed;
+  background-size: cover;
+  opacity: 0.36;
+  pointer-events: none;
+}
+.toggle-mode {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: 2px solid var(--button-bg);
+  color: var(--button-bg);
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 10px #38404a22;
+  transition: 0.3s;
+  z-index: 2;
+}
+.toggle-mode:hover {
+  background: var(--button-bg);
+  color: #fff;
+  border-color: #fff;
+}
+.container {
+  max-width: 600px;
+  margin: 80px auto 0;
+  background: var(--glass-bg);
+  padding: 36px 30px 30px 30px;
+  border-radius: 24px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(8px);
+  position: relative;
+  z-index: 1;
+}
+h1 {
+  margin: 0 0 22px;
+  font-size: 28px;
+  color: var(--button-bg);
+  letter-spacing: .5px;
+  text-shadow: 0 0 8px #1d9bf022;
+}
+.search-bar {
+  display: flex;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #1d9bf011;
+}
+.search-bar input {
+  flex: 1;
+  padding: 13px;
+  font-size: 15px;
+  border: none;
+  background: var(--input-bg);
+  color: var(--text-color);
+  outline: none;
+}
+.search-bar input:focus {
+  background: #fff5;
+}
+.search-bar button {
+  padding: 13px 20px;
+  border: none;
+  background: var(--button-bg);
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+.search-bar button:hover {
+  background: var(--button-hover);
+}
+.chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.chat-item {
+  padding: 16px 16px;
+  background: #22262d;
+  border: 2px solid #1d9bf044;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 2px 10px #1d9bf022;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
+  letter-spacing: .2px;
+  overflow: hidden;
+}
+body:not(.dark) .chat-item {
+  background: #f7fafd;
+  color: #1d9bf0;
+  border: 2px solid #bfc9d1;
+}
+.chat-item:hover {
+  background: #1d9bf0;
+  color: #fff;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 24px #1d9bf033;
+}
+.chat-item span {
+  font-weight: 700;
+  text-shadow: 0 0 8px #1d9bf022;
+}
+.logout-btn,
+.delete-account-btn {
+  position: fixed;
+  right: 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 1000;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px #1d9bf022;
+  padding: 12px 18px;
+}
+.logout-btn {
+  bottom: 60px;
+  background: #1d9bf0;
+  color: white;
+  margin-bottom: 28px;
+}
+.logout-btn:hover {
+  background: #0c7abf;
+}
+.delete-account-btn {
+  bottom: 20px;
+  background: #f43f5e;
+  color: white;
+}
+.delete-account-btn:hover {
+  background: #be123c;
+}
+/* Modal Glassmorphism */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(16,20,30,0.70);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+.modal.show { display: flex; }
+.modal-content {
+  background: var(--modal-bg);
+  border: 2px solid var(--modal-border);
+  box-shadow: 0 10px 40px 0 #000a;
+  border-radius: 18px;
+  padding: 36px 32px;
+  min-width: 320px;
+  max-width: 90vw;
+  color: var(--text-color);
+}
+.modal-content p {
+  margin: 0 0 10px 0;
+  font-size: 17px;
+  color: var(--button-bg);
+  text-align: center;
+}
+.modal-content input[type="password"] {
+  width: 100%;
+  padding: 13px;
+  margin: 14px 0 18px 0;
+  font-size: 15px;
+  border: 1.5px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+.modal-content .modal-actions {
+  display: flex;
+  gap: 22px;
+  margin-top: 10px;
+  justify-content: center;
+}
+.modal-content button {
+  padding: 10px 18px;
+  font-size: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+.confirm-btn {
+  background: #f43f5e;
+  color: white;
+}
+.confirm-btn:hover {
+  background: #be123c;
+}
+.exit-btn {
+  background: #1d9bf0;
+  color: white;
+}
+.exit-btn:hover {
+  background: #0c7abf;
+}
+</style>
+</head>
+<body>
+<button class="toggle-mode" onclick="toggleDarkMode()">Dark Mode</button>
+<button class="logout-btn" onclick="logout()">Log Out</button>
+<button class="delete-account-btn" onclick="showDeleteModal()">Delete Account</button>
+<div class="container">
+  <h1>Chats</h1>
+  <div class="search-bar">
+    <input id="searchInput" placeholder="Search Username" />
+    <button onclick="search()">Search</button>
+  </div>
+  <div id="chatList" class="chat-list"></div>
+</div>
+<!-- Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <p>Enter your password to delete your account:</p>
+    <input type="password" id="deletePassword" placeholder="Password" />
+    <p>Would you like to delete account permanently?</p>
+    <div class="modal-actions">
+      <button class="confirm-btn" onclick="deleteAccount()">Confirm</button>
+      <button class="exit-btn" onclick="closeDeleteModal()">Exit</button>
+    </div>
+  </div>
+</div>
+<script>
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+}
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+}
+const token = localStorage.getItem("token");
+async function loadUsers(searchQuery = "") {
+  const url = new URL("http://localhost:8000/active_chats");
+  if (searchQuery) url.searchParams.append("search", searchQuery);
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) {
+    alert("Failed to load users.");
+    return;
+  }
+  const users = await res.json();
+  const list = document.getElementById("chatList");
+  list.innerHTML = "";
+  users.forEach(username => {
+    const div = document.createElement("div");
+    div.className = "chat-item";
+    div.innerHTML = `<span>${username}</span>`;
+    div.onclick = () => {
+      window.location.href = `chatroom.html?user=${encodeURIComponent(username)}`;
+    };
+    list.appendChild(div);
+  });
+}
+function search() {
+  const query = document.getElementById("searchInput").value.trim();
+  loadUsers(query);
+}
+function showDeleteModal() {
+  document.getElementById("deleteModal").classList.add("show");
+  document.getElementById("deletePassword").value = "";
+  document.getElementById("deletePassword").focus();
+}
+function closeDeleteModal() {
+  document.getElementById("deleteModal").classList.remove("show");
+}
+async function deleteAccount() {
+  const password = document.getElementById("deletePassword").value;
+  const res = await fetch("http://localhost:8000/delete_account", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ password })
+  });
+  if (res.ok) {
+    alert("Account deleted.");
+    localStorage.clear();
+    window.location.href = "index.html";
+  } else {
+    alert("Incorrect password or failed to delete account.");
+  }
+}
+function logout() {
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+loadUsers();
+</script>
+</body>
+</html>

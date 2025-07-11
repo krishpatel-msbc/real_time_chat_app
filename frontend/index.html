@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Real-Time Chat - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light theme */
+      --bg-gradient: linear-gradient(135deg, #e6ecf0 0%, #cfd9df 100%);
+      --bg-image: url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80');
+      --glass-bg: rgba(255,255,255,0.90);
+      --card-border: #e1e8ed;
+      --card-shadow: 0 10px 40px 0 rgba(20, 30, 40, 0.10);
+      --button-bg: #1d9bf0;
+      --button-hover: #0c7abf;
+      --button-text: #fff;
+      --input-bg: #f7fafd;
+      --input-border: #bfc9d1;
+      --text-color: #1a1a1a;
+      --modal-bg: rgba(255,255,255,0.98);
+      --modal-border: #e1e8ed;
+    }
+    body.dark {
+      /* Dark theme */
+      --bg-gradient: linear-gradient(135deg, #10151a 0%, #181c21 100%);
+      --bg-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80');
+      --glass-bg: rgba(24,28,33,0.96);
+      --card-border: #22272a;
+      --card-shadow: 0 10px 40px 0 rgba(10, 12, 15, 0.40);
+      --button-bg: #1d9bf0;
+      --button-hover: #0c7abf;
+      --button-text: #fff;
+      --input-bg: #23272f;
+      --input-border: #38404a;
+      --text-color: #f7fafd;
+      --modal-bg: #181c21;
+      --modal-border: #38404a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-gradient), var(--bg-image) no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.5s, color 0.5s;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: var(--bg-gradient), var(--bg-image) no-repeat center center fixed;
+      background-size: cover;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .toggle-mode {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      border: 2px solid var(--button-bg);
+      color: var(--button-bg);
+      border-radius: 20px;
+      padding: 7px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 2px 10px #38404a22;
+      transition: 0.3s;
+      z-index: 2;
+    }
+    .toggle-mode:hover {
+      background: var(--button-bg);
+      color: #fff;
+      border-color: #fff;
+    }
+    .center-box {
+      background: var(--glass-bg);
+      padding: 44px 32px 36px 32px;
+      width: 90%;
+      max-width: 410px;
+      border-radius: 24px;
+      border: 1.5px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      animation: fadeIn 0.9s cubic-bezier(.4,2,.6,1);
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(8px);
+    }
+    .logo-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+    .logo-title img {
+      height: 44px;
+      margin-right: 13px;
+      filter: grayscale(1) brightness(0.8);
+    }
+    .logo-title h1 {
+      font-size: 32px;
+      color: var(--button-bg);
+      text-shadow: 0 0 10px #38404a33;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .form-section {
+      text-align: center;
+      margin-top: 6%;
+    }
+    h2 {
+      margin-bottom: 16px;
+      color: var(--button-bg);
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 10px 0;
+      border: 1.5px solid var(--input-border);
+      border-radius: 12px;
+      font-size: 16px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.3s, box-shadow 0.3s;
+      outline: none;
+      box-shadow: 0 2px 8px #38404a11;
+    }
+    input:focus {
+      border-color: var(--button-bg);
+      box-shadow: 0 0 12px var(--button-bg);
+    }
+    .action-row {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 18px;
+    }
+    button.action {
+      width: 110px;
+      padding: 11px;
+      font-size: 14px;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: .5px;
+      box-shadow: 0 4px 16px #1d9bf022;
+      transition: all 0.22s cubic-bezier(.4,2,.6,1);
+    }
+    button.action:hover {
+      background: var(--button-hover);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 24px #1d9bf033;
+    }
+    /* Modal Example (for consistency with others) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(16,20,30,0.70);
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: var(--modal-bg);
+      border: 2px solid var(--modal-border);
+      box-shadow: 0 10px 40px 0 #000a;
+      border-radius: 18px;
+      padding: 36px 32px;
+      min-width: 320px;
+      max-width: 90vw;
+      color: var(--text-color);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-mode" onclick="toggleDarkMode()">Dark Mode</button>
+  <div class="center-box">
+    <div class="logo-title">
+      <img src="https://toppng.com/uploads/preview/phone-icon-11549498584attf3ik674.png" alt="Logo" />
+      <h1>Real-Time.com</h1>
+    </div>
+    <div class="form-section">
+      <h2>Login / Register</h2>
+      <input id="username" placeholder="Username" autocomplete="username" />
+      <input id="password" placeholder="Password" type="password" autocomplete="current-password" />
+      <div class="action-row">
+        <button class="action" onclick="login()">Login</button>
+        <button class="action" onclick="register()">Register</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+    async function login() {
+      const res = await fetch("http://localhost:8000/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `username=${username.value}&password=${password.value}`
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("username", username.value);
+        window.location.href = "chat.html";
+      } else {
+        alert("Login failed.");
+      }
+    }
+    async function register() {
+      const res = await fetch("http://localhost:8000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value
+        })
+      });
+      if (res.ok) {
+        alert("Registered successfully. Now login.");
+        username.value = "";
+        password.value = "";
+      } else {
+        alert("Registration failed.");
+      }
+    }
+  </script>
+</body>
+</html>
