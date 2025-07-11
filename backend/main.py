@@ -94,7 +94,7 @@ def delete_account(
     delete_user(db, user)
     return {"detail": "Account deleted successfully"}
 
-# --- WebSocket Chatroom Logic ---
+# WebSocket Chatroom Logic
 
 from collections import defaultdict
 

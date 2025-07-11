@@ -81,4 +81,3 @@ def get_active_or_searched_chats(db: Session, user_id: int, search: Optional[str
 def delete_user(db: Session, user: User):
     db.delete(user)
     db.commit()
-

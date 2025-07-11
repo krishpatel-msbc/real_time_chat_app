@@ -114,6 +114,12 @@ body::before {
   flex-direction: column;
   gap: 18px;
 }
+.bubble-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* ensures right alignment for both bubble and seen */
+}
 .bubble {
   max-width: 75%;
   padding: 14px 18px;
@@ -272,6 +278,20 @@ body::before {
 #logoutModal .exit-btn:hover {
   background: #0c7abf;
 }
+/* Seen indicator below bubble, right-aligned, hugging the bubble */
+.seen-indicator-below {
+  display: block;
+  font-size: 11px;
+  color: #fff;
+  opacity: 0.85;
+  font-weight: 400;
+  margin-top: 2px;       /* minimal vertical gap */
+  margin-bottom: 0;
+  padding-right: 4px;    /* aligns with bubble's inner padding */
+  text-align: right;
+  width: auto;
+  max-width: 100%;
+}
 </style>
 </head>
 <body>
@@ -307,7 +327,6 @@ function toggleDarkMode() {
 function goBack() {
   window.location.href = "chat.html";
 }
-// Logout Modal logic
 function showLogoutModal() {
   document.getElementById("logoutModal").classList.add("show");
 }
@@ -318,6 +337,7 @@ function confirmLogout() {
   localStorage.clear();
   window.location.href = "index.html";
 }
+
 const token = localStorage.getItem("token");
 const params = new URLSearchParams(window.location.search);
 const otherUser = params.get("user");
@@ -329,6 +349,7 @@ document.getElementById("chatHeader").textContent = otherUser;
 const chatMessages = document.getElementById("chatMessages");
 let myUserId = null;
 let myUsername = null;
+
 async function getMyInfo() {
   const res = await fetch("http://localhost:8000/me", {
     headers: { Authorization: `Bearer ${token}` }
@@ -351,24 +372,62 @@ function isMine(msg) {
   }
   return false;
 }
+
+let messagesCache = [];
+let lastMessageIds = [];
+
+function renderMessages(messages) {
+  const ids = messages.map(m => m.id);
+  if (JSON.stringify(ids) === JSON.stringify(lastMessageIds)) return;
+
+  const isAtBottom = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 5;
+
+  chatMessages.innerHTML = "";
+  let lastMineIdx = -1;
+  messages.forEach((msg, idx) => {
+    if (isMine(msg)) lastMineIdx = idx;
+  });
+
+  messages.forEach((msg, idx) => {
+    // Wrap each bubble (and seen indicator) in a flex column container
+    const container = document.createElement("div");
+    container.className = "bubble-container";
+    const div = document.createElement("div");
+    div.className = "bubble " + (isMine(msg) ? "user" : "other");
+    div.textContent = msg.content;
+    container.appendChild(div);
+
+    // Only show "Seen" for the last message sent by me that has been seen
+    if (
+      isMine(msg) &&
+      idx === lastMineIdx &&
+      (msg.seen || msg.seen_at)
+    ) {
+      const seenDiv = document.createElement("div");
+      seenDiv.className = "seen-indicator-below";
+      seenDiv.textContent = "Seen";
+      container.appendChild(seenDiv);
+    }
+    chatMessages.appendChild(container);
+  });
+
+  if (isAtBottom) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  lastMessageIds = ids;
+}
+
 async function fetchMessages() {
   const res = await fetch(`http://localhost:8000/messages/${encodeURIComponent(otherUser)}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) {
-    chatMessages.innerHTML = "<div>Failed to load messages.</div>";
-    return;
-  }
+  if (!res.ok) return;
   const messages = await res.json();
-  chatMessages.innerHTML = "";
-  messages.forEach(msg => {
-    const div = document.createElement("div");
-    div.className = "bubble " + (isMine(msg) ? "user" : "other");
-    div.textContent = msg.content;
-    chatMessages.appendChild(div);
-  });
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  messagesCache = messages;
+  renderMessages(messages);
 }
+
 let ws = null;
 function connectWebSocket() {
   if (ws) ws.close();
@@ -381,11 +440,7 @@ function connectWebSocket() {
     } catch {
       return;
     }
-    const div = document.createElement("div");
-    div.className = "bubble " + (isMine(data) ? "user" : "other");
-    div.textContent = data.message;
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    fetchMessages();
   };
   ws.onclose = () => {
     setTimeout(connectWebSocket, 2000);
@@ -414,11 +469,12 @@ function sendMessage() {
   messageInput.value = "";
   messageInput.focus();
 }
+
 (async function init() {
   await getMyInfo();
   await fetchMessages();
   connectWebSocket();
-  setInterval(fetchMessages, 10000);
+  setInterval(fetchMessages, 2000);
 })();
 </script>
 </body>
