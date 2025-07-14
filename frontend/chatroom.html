@@ -118,17 +118,17 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  /* ensures right alignment for both bubble and seen */
 }
 .bubble {
   max-width: 75%;
-  padding: 14px 18px;
+  padding: 14px 18px 6px 18px;
   border-radius: 22px;
   font-size: 15px;
   word-break: break-word;
   display: inline-block;
   box-shadow: 0 2px 12px #38404a11;
   animation: popIn 0.3s;
+  position: relative;
 }
 .bubble.user {
   background: var(--bubble-user);
@@ -141,6 +141,31 @@ body::before {
   color: var(--text-color);
   align-self: flex-start;
   border-bottom-left-radius: 6px;
+}
+.bubble .timestamp {
+  display: block;
+  font-size: 8.25px;
+  opacity: 0.85;
+  font-weight: 400;
+  margin-top: 2px;
+  width: 100%;
+  line-height: 1.2;
+}
+.bubble.user .timestamp {
+  color: #d1eaff;
+  text-align: right;
+  padding-right: 0.15em;
+}
+.bubble.other .timestamp {
+  color: #7a8b9e;
+  text-align: left;
+  padding-left: 0.15em;
+}
+body:not(.dark) .bubble.user .timestamp {
+  color: #e4e4e4;
+}
+body:not(.dark) .bubble.other .timestamp {
+  color: #7a8b9e;
 }
 @keyframes popIn {
   from { opacity: 0; transform: scale(0.96);}
@@ -278,16 +303,15 @@ body::before {
 #logoutModal .exit-btn:hover {
   background: #0c7abf;
 }
-/* Seen indicator below bubble, right-aligned, hugging the bubble */
 .seen-indicator-below {
   display: block;
   font-size: 11px;
   color: #fff;
   opacity: 0.85;
   font-weight: 400;
-  margin-top: 2px;       /* minimal vertical gap */
+  margin-top: 2px;
   margin-bottom: 0;
-  padding-right: 4px;    /* aligns with bubble's inner padding */
+  padding-right: 4px;
   text-align: right;
   width: auto;
   max-width: 100%;
@@ -376,6 +400,34 @@ function isMine(msg) {
 let messagesCache = [];
 let lastMessageIds = [];
 
+// Format timestamp helper
+function formatTimestamp(ts) {
+  if (!ts) return "";
+  let date;
+  if (typeof ts === "number") {
+    date = new Date(ts * 1000);
+  } else {
+    date = new Date(ts);
+  }
+  if (isNaN(date.getTime())) return "";
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  let h = date.getHours();
+  let m = date.getMinutes();
+  let ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  h = h ? h : 12;
+  const mm = m < 10 ? "0" + m : m;
+  let timeStr = h + ":" + mm + " " + ampm;
+  if (!isToday) {
+    const d = date.getDate();
+    const mo = date.getMonth() + 1;
+    const y = date.getFullYear();
+    timeStr = d + "/" + mo + "/" + y + " " + timeStr;
+  }
+  return timeStr;
+}
+
 function renderMessages(messages) {
   const ids = messages.map(m => m.id);
   if (JSON.stringify(ids) === JSON.stringify(lastMessageIds)) return;
@@ -389,17 +441,26 @@ function renderMessages(messages) {
   });
 
   messages.forEach((msg, idx) => {
-    // Wrap each bubble (and seen indicator) in a flex column container
     const container = document.createElement("div");
     container.className = "bubble-container";
     const div = document.createElement("div");
-    div.className = "bubble " + (isMine(msg) ? "user" : "other");
-    div.textContent = msg.content;
+    const mine = isMine(msg);
+    div.className = "bubble " + (mine ? "user" : "other");
+
+    // Add message text as a text node
+    div.appendChild(document.createTextNode(msg.content));
+
+    // Timestamp (below text, aligned as per sender/receiver)
+    const ts = document.createElement("span");
+    ts.className = "timestamp";
+    ts.textContent = formatTimestamp(msg.timestamp);
+    div.appendChild(document.createElement("br"));
+    div.appendChild(ts);
+
     container.appendChild(div);
 
-    // Only show "Seen" for the last message sent by me that has been seen
     if (
-      isMine(msg) &&
+      mine &&
       idx === lastMineIdx &&
       (msg.seen || msg.seen_at)
     ) {
