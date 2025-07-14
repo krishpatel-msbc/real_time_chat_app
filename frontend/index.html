@@ -8,11 +8,11 @@
     :root {
       --bg-gradient: linear-gradient(135deg, #e6ecf0 0%, #cfd9df 100%);
       --bg-image: url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80');
-      --glass-bg: rgba(255,255,255,0.90);
+      --glass-bg: rgba(255,255,255,0.92);
       --card-border: #e1e8ed;
       --card-shadow: 0 10px 40px 0 rgba(20, 30, 40, 0.10);
-      --button-bg: #022f6f;
-      --button-hover: #011a3a;
+      --button-bg: #1d9bf0;
+      --button-hover: #0c7abf;
       --button-text: #fff;
       --input-bg: #f7fafd;
       --input-border: #bfc9d1;
@@ -26,8 +26,8 @@
       --glass-bg: rgba(24,28,33,0.96);
       --card-border: #22272a;
       --card-shadow: 0 10px 40px 0 rgba(10, 12, 15, 0.40);
-      --button-bg: #022f6f;
-      --button-hover: #011a3a;
+      --button-bg: #1d9bf0;
+      --button-hover: #0c7abf;
       --button-text: #fff;
       --input-bg: #23272f;
       --input-border: #38404a;
@@ -56,7 +56,7 @@
       z-index: 0;
       background: var(--bg-gradient), var(--bg-image) no-repeat center center fixed;
       background-size: cover;
-      opacity: 0.35;
+      opacity: 0.36;
       pointer-events: none;
     }
     .toggle-mode {
@@ -156,14 +156,14 @@
       cursor: pointer;
       font-weight: 600;
       letter-spacing: .5px;
-      box-shadow: 0 4px 16px #022f6f22;
+      box-shadow: 0 4px 16px #1d9bf022;
       transition: all 0.22s cubic-bezier(.4,2,.6,1);
       margin: 0;
     }
     .action-btn button:hover {
       background: var(--button-hover);
       transform: translateY(-2px) scale(1.04);
-      box-shadow: 0 8px 24px #022f6f33;
+      box-shadow: 0 8px 24px #1d9bf033;
     }
     /* Modal Styles */
     .modal {
@@ -228,7 +228,7 @@
       background: var(--button-hover);
     }
     .register-feedback {
-      color: #e74c3c;
+      color: #f43f5e;
       margin-top: 10px;
       min-height: 22px;
       text-align: center;
@@ -334,12 +334,12 @@
 
     if (!username || !password || !confirm) {
       feedback.textContent = "Please fill all fields.";
-      feedback.style.color = "#e74c3c";
+      feedback.style.color = "#f43f5e";
       return;
     }
     if (password !== confirm) {
       feedback.textContent = "Passwords do not match.";
-      feedback.style.color = "#e74c3c";
+      feedback.style.color = "#f43f5e";
       return;
     }
     try {
@@ -362,11 +362,11 @@
             msg = "Username taken";
           }
         } catch (e) {}
-        feedback.style.color = "#e74c3c";
+        feedback.style.color = "#f43f5e";
         feedback.textContent = msg;
       }
     } catch (err) {
-      feedback.style.color = "#e74c3c";
+      feedback.style.color = "#f43f5e";
       feedback.textContent = "Registration failed.";
     }
   }
