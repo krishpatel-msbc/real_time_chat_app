@@ -6,7 +6,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Light theme */
   --bg-gradient: linear-gradient(135deg, #e6ecf0 0%, #cfd9df 100%);
   --bg-image: url('https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80');
   --glass-bg: rgba(255,255,255,0.92);
@@ -22,7 +21,6 @@
   --modal-border: #e1e8ed;
 }
 body.dark {
-  /* Dark theme */
   --bg-gradient: linear-gradient(135deg, #10151a 0%, #181c21 100%);
   --bg-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80');
   --glass-bg: rgba(24,28,33,0.96);
@@ -268,11 +266,71 @@ body:not(.dark) .chat-item {
 .exit-btn:hover {
   background: #0c7abf;
 }
+/* Logout Confirmation Modal */
+#logoutModal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(16,20,30,0.70);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+#logoutModal.show { display: flex; }
+#logoutModal .modal-content {
+  background: var(--modal-bg);
+  border: 2px solid var(--modal-border);
+  box-shadow: 0 10px 40px 0 #000a;
+  border-radius: 18px;
+  padding: 36px 32px;
+  min-width: 320px;
+  max-width: 90vw;
+  color: var(--text-color);
+}
+#logoutModal .modal-content p {
+  margin: 0 0 18px 0;
+  font-size: 17px;
+  text-align: center;
+  color: var(--button-bg);
+}
+#logoutModal .modal-actions {
+  display: flex;
+  gap: 22px;
+  margin-top: 10px;
+  justify-content: center;
+}
+#logoutModal .modal-content button {
+  padding: 10px 18px;
+  font-size: 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+#logoutModal .confirm-btn {
+  background: #f43f5e;
+  color: white;
+}
+#logoutModal .confirm-btn:hover {
+  background: #be123c;
+}
+#logoutModal .exit-btn {
+  background: #1d9bf0;
+  color: white;
+}
+#logoutModal .exit-btn:hover {
+  background: #0c7abf;
+}
 </style>
 </head>
 <body>
 <button class="toggle-mode" onclick="toggleDarkMode()">Dark Mode</button>
-<button class="logout-btn" onclick="logout()">Log Out</button>
+<button class="logout-btn" onclick="showLogoutModal()">Log Out</button>
 <button class="delete-account-btn" onclick="showDeleteModal()">Delete Account</button>
 <div class="container">
   <h1>Chats</h1>
@@ -282,7 +340,7 @@ body:not(.dark) .chat-item {
   </div>
   <div id="chatList" class="chat-list"></div>
 </div>
-<!-- Modal -->
+<!-- Delete Account Modal -->
 <div id="deleteModal" class="modal">
   <div class="modal-content">
     <p>Enter your password to delete your account:</p>
@@ -291,6 +349,16 @@ body:not(.dark) .chat-item {
     <div class="modal-actions">
       <button class="confirm-btn" onclick="deleteAccount()">Confirm</button>
       <button class="exit-btn" onclick="closeDeleteModal()">Exit</button>
+    </div>
+  </div>
+</div>
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal">
+  <div class="modal-content">
+    <p>Do you want to Log Out?</p>
+    <div class="modal-actions">
+      <button class="confirm-btn" onclick="confirmLogout()">Confirm</button>
+      <button class="exit-btn" onclick="closeLogoutModal()">Back</button>
     </div>
   </div>
 </div>
@@ -356,7 +424,14 @@ async function deleteAccount() {
     alert("Incorrect password or failed to delete account.");
   }
 }
-function logout() {
+// Logout Confirmation Logic
+function showLogoutModal() {
+  document.getElementById("logoutModal").classList.add("show");
+}
+function closeLogoutModal() {
+  document.getElementById("logoutModal").classList.remove("show");
+}
+function confirmLogout() {
   localStorage.clear();
   window.location.href = "index.html";
 }

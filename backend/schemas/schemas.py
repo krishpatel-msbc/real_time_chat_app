@@ -17,13 +17,13 @@ class MessageDisplay(BaseModel):
     seen: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserPublic(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class DeleteAccountRequest(BaseModel):
     password: str
